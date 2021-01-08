@@ -26,8 +26,21 @@ function renderCafe(doc){
     })
 }
 
-db.collection('cafe').get().then(snapshot =>{
-    snapshot.docs.forEach(doc => renderCafe(doc))
+// db.collection('cafe').get().then(snapshot =>{
+//     snapshot.docs.forEach(doc => renderCafe(doc))
+// })
+
+// RealTime data
+db.collection('cafe').onSnapshot(snapshot=>{
+    let changes =  snapshot.docChanges();
+    changes.forEach(change=>{
+        if(change.type == 'added'){
+            renderCafe(change.doc)
+        }else if(change.type == 'removed'){
+            let li = cafes.querySelector('[data-id='+change.doc.id+']');
+            cafes.removeChild(li);
+        }
+    })
 })
 form.addEventListener('submit',addItem);
 function addItem(e){
